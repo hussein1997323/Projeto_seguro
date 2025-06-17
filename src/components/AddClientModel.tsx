@@ -166,7 +166,7 @@ export default function ClientModal({
             <li
               key={key}
               className={`cursor-pointer ${
-                // @ts-ignore
+                // @ts-expect-error
                 formData.selectedTab === key
                   ? "font-bold border-b-2 border-blue-500"
                   : ""

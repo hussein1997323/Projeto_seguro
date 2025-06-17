@@ -11,7 +11,7 @@ export default function Layout({
 }>) {
   const router = useRouter();
   useEffect(() => {
-    let value = localStorage.getItem("sistema-cadastro-keite:token");
+    const value = localStorage.getItem("sistema-cadastro-keite:token");
     if (!value) {
       router.push("/login");
     }

@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 export default function Login() {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setErro] = useState("");
+
   const router = useRouter();
 
   useEffect(() => {
@@ -16,7 +16,7 @@ export default function Login() {
     if (token) {
       router.replace("/"); // Se já logado, vai direto pra home
     }
-  }, []);
+  });
 
   const handlogin = async (e: any) => {
     e.preventDefault();
@@ -34,10 +34,10 @@ export default function Login() {
       );
 
       router.replace("/"); // Redireciona e evita voltar
-    } catch (error: any) {
-      console.log("Erro ao logar:", error);
-      setErro(error?.response?.data?.msg || "Erro ao fazer login.");
-      alert("Erro ao fazer login. Verifique seus dados.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(error.message);
+      }
     }
   };
 
