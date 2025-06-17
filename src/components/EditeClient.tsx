@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import { IPost } from "../types/postTypes";
 import makeRequest from "@/services/services";
+import { AxiosError } from "axios";
 
-function AddClient({
-  setShowModal,
-  initialData,
-}: {
+interface AddClientProps {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   initialData?: IPost;
-}) {
-  const [formData, setFormData] = useState({
+}
+
+export default function AddClient({
+  setShowModal,
+  initialData,
+}: AddClientProps) {
+  // Use Partial<IPost> to allow missing id during form state
+  const [formData, setFormData] = useState<Partial<IPost>>({
     username: initialData?.username || "",
     email: initialData?.email || "",
     cpf: initialData?.cpf || "",
@@ -46,35 +50,31 @@ function AddClient({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (initialData) {
-      const endpoint = "/clienteEdite";
-      const payload = { ...formData, id: initialData.id };
-      console.log("Enviando PATCH para:", endpoint, "com payload:", payload);
-      try {
-        const res = await makeRequest.patch(endpoint, payload);
-        console.log("Requisição PATCH bem-sucedida. Resposta:", res);
-        alert("Cliente atualizado com sucesso!");
-        setShowModal(false);
-      } catch (err: any) {
-        console.error("Erro na requisição PATCH:");
-        console.error("Mensagem do erro:", err.message);
-        if (err.response) {
-          console.error(
-            "Detalhes da resposta de erro (data):",
-            JSON.stringify(err.response.data, null, 2)
-          );
-          console.error("Status do erro:", err.response.status);
-          console.error("Headers da resposta:", err.response.headers);
-        } else if (err.request) {
-          console.error("Nenhuma resposta recebida. Requisição:", err.request);
-        } else {
-          console.error("Erro ao configurar a requisição:", err.message);
-        }
-        alert("Erro ao salvar cliente.");
-      }
+    if (!initialData) {
+      return; // criação não implementada
     }
-    // Lógica para adicionar novo cliente (se aplicável)
-    // Atualmente, o caso 'if (!initialData)' não está sendo tratado neste handleSubmit
+
+    const endpoint = "/clienteEdite";
+    // payload includes id from initialData
+    const payload: IPost = { ...(formData as IPost), id: initialData.id };
+    console.log("Enviando PATCH para:", endpoint, "com payload:", payload);
+    try {
+      const res = await makeRequest.patch(endpoint, payload);
+      console.log("Requisição PATCH bem-sucedida. Resposta:", res);
+      alert("Cliente atualizado com sucesso!");
+      setShowModal(false);
+    } catch (err: unknown) {
+      console.error("Erro na requisição PATCH:");
+      let errorMessage = "Erro ao salvar cliente.";
+      if (err instanceof AxiosError) {
+        errorMessage = err.response?.data?.message || err.message;
+        console.error("Detalhes da resposta de erro:", err.response?.data);
+        console.error("Status do erro:", err.response?.status);
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      alert(errorMessage);
+    }
   };
 
   const fields = [
@@ -124,7 +124,7 @@ function AddClient({
         className="bg-white rounded-2xl shadow-lg p-6 max-w-3xl w-full max-h-[90vh] overflow-auto"
       >
         <h2 className="text-2xl font-semibold mb-6 text-left">
-          {initialData ? "Editar Cliente" : "Adicionar Cliente"}
+          Editar Cliente
         </h2>
         <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
           {fields.map((field) => (
@@ -139,7 +139,7 @@ function AddClient({
                 <textarea
                   id={field.name}
                   name={field.name}
-                  value={formData[field.name as keyof typeof formData]}
+                  value={formData[field.name as keyof Partial<IPost>] || ""}
                   onChange={handleChange}
                   rows={3}
                   className="p-2 border rounded-lg"
@@ -149,7 +149,7 @@ function AddClient({
                   id={field.name}
                   name={field.name}
                   type={field.type}
-                  value={formData[field.name as keyof typeof formData]}
+                  value={formData[field.name as keyof Partial<IPost>] || ""}
                   onChange={handleChange}
                   placeholder={field.placeholder}
                   className="p-2 border rounded-lg"
@@ -170,7 +170,7 @@ function AddClient({
               type="submit"
               className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
-              {initialData ? "Salvar" : "Adicionar"}
+              Salvar
             </button>
           </div>
         </form>
@@ -178,5 +178,3 @@ function AddClient({
     </div>
   );
 }
-
-export default AddClient;

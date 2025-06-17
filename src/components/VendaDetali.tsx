@@ -37,17 +37,19 @@ interface Props {
   onClose: () => void;
 }
 
+// Define tabs as a const tuple for precise typing
+const tabs = ["Informações"] as const;
+type Tab = (typeof tabs)[number];
+
 export default function VendaDetailModal({ post, onClose }: Props) {
-  const [selectedTab, setSelectedTab] = useState<"Informações" | "Documentos">(
-    "Informações"
-  );
+  const [selectedTab, setSelectedTab] = useState<Tab>(tabs[0]);
 
   const infoFields = [
     { label: "Cliente", value: post.username },
     { label: "CPF", value: post.cpf },
     { label: "Status", value: post.status },
-    { label: "C.rua", value: post.rua },
-    { label: "C.cidade", value: post.cidade },
+    { label: "Rua", value: post.rua },
+    { label: "Cidade", value: post.cidade },
     { label: "Apólice", value: post.apolice },
     { label: "Seguro", value: post.seguro },
     { label: "Produto", value: post.produto },
@@ -94,10 +96,10 @@ export default function VendaDetailModal({ post, onClose }: Props) {
 
         {/* Abas */}
         <ul className="flex space-x-4 border-b pb-2 mb-4">
-          {["Informações"].map((tab) => (
+          {tabs.map((tab) => (
             <li
               key={tab}
-              onClick={() => setSelectedTab(tab as any)}
+              onClick={() => setSelectedTab(tab)}
               className={`cursor-pointer px-2 pb-1 relative
                 bg-gradient-to-r from-sky-600 via-sky-400 to-sky-100
                 bg-no-repeat bg-bottom
@@ -114,7 +116,7 @@ export default function VendaDetailModal({ post, onClose }: Props) {
         </ul>
 
         {/* Conteúdo das abas */}
-        {selectedTab === "Informações" ? (
+        {selectedTab === tabs[0] && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 text-sm text-gray-700">
             {infoFields.map(({ label, value }) => (
               <div key={label} className="flex flex-col">
@@ -127,12 +129,6 @@ export default function VendaDetailModal({ post, onClose }: Props) {
               </div>
             ))}
           </div>
-        ) : (
-          <>
-            <div className="mb-4 text-sm text-gray-700">
-              {/* Aqui você pode adicionar botões ou filtros para “novo documento” se desejar */}
-            </div>
-          </>
         )}
       </div>
     </div>

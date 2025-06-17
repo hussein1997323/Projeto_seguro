@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import makeRequest from "@/services/services";
+import { AxiosError } from "axios";
 
-export default function App() {
+export default function Pasta() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
 
@@ -22,9 +23,13 @@ export default function App() {
       const res = await makeRequest.post("/pasta", formData);
       const data = res.data;
       setMessage(data.message || "Arquivo enviado com sucesso!");
-    } catch (error: any) {
-      const errorMsg =
-        error.response?.data?.error || "Erro na conexão com o servidor";
+    } catch (error: unknown) {
+      let errorMsg = "Erro na conexão com o servidor";
+      if (error instanceof AxiosError) {
+        errorMsg = error.response?.data?.error || errorMsg;
+      } else if (error instanceof Error) {
+        errorMsg = error.message;
+      }
       setMessage(errorMsg);
     }
   };

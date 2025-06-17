@@ -1,7 +1,8 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  devIndicators: false,
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    domains: ["yt3.googleusercontent.com"], // Adicione aqui os domínios permitidos
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

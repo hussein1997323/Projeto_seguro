@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { AxiosError } from "axios";
 import makeRequest from "@/services/services";
 import { formatarCPF, formatarCEP } from "@/utils/formatters";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import VendaDetailModal, { IVenda } from "./VendaDetali";
 import { MdOutlineModeEdit, MdDelete } from "react-icons/md";
+import { IVendaPayload } from "@/types/vendaTypes";
 
 export default function Vendas() {
   const [listaVindas, setListaVindas] = useState<IVenda[]>([]);
@@ -51,8 +53,14 @@ export default function Vendas() {
     try {
       const res = await makeRequest.get("/vindas/searchVenda");
       setListaVindas(res.data);
-    } catch (error: any) {
-      console.error("Erro ao buscar vindas:", error);
+    } catch (error: unknown) {
+      let msg = "Erro ao buscar vindas.";
+      if (error instanceof AxiosError) {
+        msg = error.response?.data?.msg || error.message;
+      } else if (error instanceof Error) {
+        msg = error.message;
+      }
+      console.error(msg);
     }
   };
 
@@ -171,7 +179,7 @@ export default function Vendas() {
     const vendedor = user?.username || "Desconhecido";
 
     // Monta o payload com todos os campos necessários
-    const payload: any = {
+    const payload: IVendaPayload = {
       client_id: client.id,
       cpf,
       username,
@@ -238,11 +246,17 @@ export default function Vendas() {
       setEditVenda(null);
       setClient(null);
       resetFormFields();
-    } catch (err: any) {
-      console.error("Erro ao salvar/editar:", err);
-      toast.error(
-        isEditing ? "Erro ao atualizar venda" : "Erro ao salvar venda"
-      );
+    } catch (err: unknown) {
+      let msg = isEditing ? "Erro ao atualizar venda" : "Erro ao salvar venda";
+
+      if (err instanceof AxiosError) {
+        msg = err.response?.data?.msg || err.message;
+      } else if (err instanceof Error) {
+        msg = err.message;
+      }
+
+      console.error(msg, err);
+      toast.error(msg);
     }
   };
 

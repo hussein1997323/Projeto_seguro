@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import ClientPost from "./ClientPost";
 import makeRequest from "@/services/services";
@@ -29,7 +27,7 @@ export default function ClientPage() {
     if (!window.confirm("Tem certeza que deseja deletar este usuário?")) return;
 
     try {
-      const res = await makeRequest.post("/clientModel/delete", { id });
+      await makeRequest.post("/clientModel/delete", { id });
       toast.success("Usuário deletado com sucesso!");
       // Aqui você pode querer atualizar a lista de clientes para refletir a exclusão
     } catch (error) {

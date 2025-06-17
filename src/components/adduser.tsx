@@ -5,6 +5,7 @@ import makeRequest from "@/services/services";
 import { formatarCPF } from "@/utils/formatters";
 import ProProtectedRoute from "./AdimPage";
 import { MdDelete } from "react-icons/md";
+import { AxiosError } from "axios";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,7 +23,7 @@ interface IPost {
 function AddUser() {
   const [users, setUsers] = useState<IPost[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [loggedUser, setLoggedUser] = useState<any>(null);
+  const [loggedUser, setLoggedUser] = useState<IPost | null>(null);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
@@ -45,7 +46,7 @@ function AddUser() {
     } else {
       window.location.href = "/login";
     }
-  }, []);
+  }, [user]);
   const handelDelete = async (id: number) => {
     if (!loggedUser) {
       toast.error("Usuário não autenticado.");
@@ -64,7 +65,7 @@ function AddUser() {
     if (!confirm) return;
 
     try {
-      const res = await makeRequest.post("/auth/delete", { id });
+      await makeRequest.post("/auth/delete", { id });
       toast.success("Usuário deletado com sucesso!");
       fetchUsers();
     } catch (error) {
@@ -75,17 +76,22 @@ function AddUser() {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  });
 
   const fetchUsers = async () => {
     try {
       const res = await makeRequest.get("/auth/search");
       setUsers(res.data);
-    } catch (error: any) {
-      console.error(
-        "Erro ao buscar usuários:",
-        error?.response?.data?.msg || error.message
-      );
+    } catch (error: unknown) {
+      let msg = "Erro ao buscar usuários.";
+
+      if (error instanceof AxiosError) {
+        msg = error.response?.data?.msg || error.message;
+      } else if (error instanceof Error) {
+        msg = error.message;
+      }
+
+      console.error("Erro ao buscar usuários:", msg);
     }
   };
 
@@ -132,15 +138,19 @@ function AddUser() {
       clearForm();
       setShowModal(false);
       fetchUsers();
-    } catch (error: any) {
-      const msg =
-        error?.response?.data?.msg ||
-        "Erro ao salvar usuário. Tente novamente.";
+    } catch (error: unknown) {
+      let msg = "Erro ao salvar usuário. Tente novamente.";
+
+      if (error instanceof AxiosError) {
+        msg = error.response?.data?.msg || msg;
+      } else if (error instanceof Error) {
+        msg = error.message || msg;
+      }
+
       setErrorMsg(msg);
       toast.error(msg);
     }
   };
-
   return (
     <ProProtectedRoute allowLevels={["1", "2"]}>
       <div className="p-6 w-full overflow-x-auto border-b">

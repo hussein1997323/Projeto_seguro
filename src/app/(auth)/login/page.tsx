@@ -18,7 +18,7 @@ export default function Login() {
     }
   });
 
-  const handlogin = async (e: any) => {
+  const handlogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {

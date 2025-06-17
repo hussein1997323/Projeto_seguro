@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CiGrid32, CiBank } from "react-icons/ci";
@@ -11,19 +12,22 @@ import { MdPersonAddAlt } from "react-icons/md";
 import { TiShoppingCart } from "react-icons/ti";
 import ProProtectedRoute from "./AdimPage";
 
-function Sidebar() {
-  const [user, setUser] = useState({ username: "", userImg: "" });
+export default function Sidebar() {
+  const [user, setUser] = useState<{ username: string; userImg: string }>({
+    username: "",
+    userImg: "",
+  });
   const [showMenu, setShowMenu] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const saveUser = localStorage.getItem("sistema-cadastro-keite:user");
     if (saveUser) {
-      setUser(JSON.parse(saveUser));
+      setUser(JSON.parse(saveUser) as { username: string; userImg: string });
     }
   }, []);
 
-  const logout = (e: any) => {
+  const logout = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     localStorage.removeItem("sistema-cadastro-keite:user");
     localStorage.removeItem("sistema-cadastro-keite:token");
@@ -32,19 +36,14 @@ function Sidebar() {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setShowMenu(true);
-      } else {
-        setShowMenu(false);
-      }
+      setShowMenu(window.innerWidth >= 768);
     };
 
     handleResize();
-
     window.addEventListener("resize", handleResize);
-
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
   return (
     <aside
       className={`relative h-screen flex flex-col bg-gray-100 
@@ -65,13 +64,12 @@ function Sidebar() {
 
       {/* Avatar e nome */}
       <div className="flex items-center gap-3 px-4 mt-12 mb-6 relative">
-        <img
-          className="w-10 h-10 rounded-full object-cover"
-          src={
-            user.userImg ||
-            "https://cdn-icons-png.flaticon.com/256/149/149071.png"
-          }
+        <Image
+          className="rounded-full object-cover"
+          src={user.userImg || "/default-user.png"}
           alt="User"
+          width={40}
+          height={40}
         />
         {showMenu && (
           <span className="text-sm font-medium text-gray-800 truncate max-w-[120px]">
@@ -162,5 +160,3 @@ function Sidebar() {
     </aside>
   );
 }
-
-export default Sidebar;

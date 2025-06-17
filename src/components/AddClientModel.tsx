@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AxiosError } from "axios";
 import makeRequest from "@/services/services";
 import { IPost } from "@/types/postTypes";
 import {
@@ -9,7 +10,9 @@ import {
   formatarCEP,
 } from "@/utils/formatters";
 import { toast } from "react-toastify";
-
+interface ExtendedPost extends IPost {
+  selectedTab?: string;
+}
 interface ClientModalProps {
   initialData: IPost | null;
   onClose: () => void;
@@ -21,8 +24,8 @@ export default function ClientModal({
   onClose,
   onSave,
 }: ClientModalProps) {
-  const [formData, setFormData] = useState<IPost>(
-    initialData || {
+  const [formData, setFormData] = useState<ExtendedPost>({
+    ...(initialData || {
       id: 0,
       username: "",
       email: "",
@@ -50,8 +53,9 @@ export default function ClientModal({
       cidade: "",
       estado: "",
       pais_mora: "",
-    }
-  );
+    }),
+    selectedTab: "pessoais",
+  });
 
   useEffect(() => {
     if (initialData) {
@@ -122,10 +126,10 @@ export default function ClientModal({
         const endpoint = "/clienteEdite/clienteEdite";
         const payload = { ...formData, id: initialData.id };
         const res = await makeRequest.patch(endpoint, payload);
-        -onSave(res.data as IPost);
+        onSave(res.data as IPost);
         toast.success("Cliente atualizado com sucesso!");
         onClose(); // fecha o modal após salvar
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Erro na requisição PATCH:", err);
         toast.error("Erro ao atualizar cliente.");
       }
@@ -133,12 +137,17 @@ export default function ClientModal({
       try {
         const res = await makeRequest.post("/clientModel/clientes", formData);
         onSave(res.data as IPost);
-      } catch (error: any) {
-        console.error("Erro ao criar cliente:", error);
-        toast.error(
-          "Erro ao criar cliente: " +
-            (error.response?.data.msg || error.message)
-        );
+      } catch (error: unknown) {
+        let errorMessage = "Erro ao criar cliente.";
+
+        if (error instanceof AxiosError) {
+          errorMessage += " " + (error.response?.data?.msg || error.message);
+        } else if (error instanceof Error) {
+          errorMessage += " " + error.message;
+        }
+
+        console.error(errorMessage, error);
+        toast.error(errorMessage);
       }
     }
   };
@@ -166,13 +175,15 @@ export default function ClientModal({
             <li
               key={key}
               className={`cursor-pointer ${
-                // @ts-expect-error
                 formData.selectedTab === key
                   ? "font-bold border-b-2 border-blue-500"
                   : ""
               }`}
               onClick={() =>
-                setFormData((prev: any) => ({ ...prev, selectedTab: key }))
+                setFormData((prev: ExtendedPost) => ({
+                  ...prev,
+                  selectedTab: key,
+                }))
               }
             >
               {label}
@@ -283,187 +294,178 @@ export default function ClientModal({
             )
           }
 
-          {
-            // @ts-ignore
-            (formData.selectedTab || "pessoais") === "complementares" && (
-              <>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex flex-col">
-                    <label
-                      htmlFor="data_nacimento"
-                      className="text-sm text-gray-700 mb-1"
-                    >
-                      Data de nascimento
-                    </label>
-                    <input
-                      name="data_nacimento"
-                      type="date"
-                      value={formData.data_nacimento}
-                      onChange={handleChange}
-                      className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500"
-                      placeholder="AAAA-mm-dd"
-                    />
-                  </div>
-                  <div className="flex flex-col">
-                    <label
-                      htmlFor="Staus"
-                      className="text-sm text-gray-700 mb-1"
-                    >
-                      Status
-                    </label>
-                    <select
-                      className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500"
-                      name="status"
-                      value={formData.status}
-                      onChange={handleChange}
-                      id="status"
-                    >
-                      <option value="" disabled>
-                        Selecione o status
-                      </option>
-                      <option value="ativo">ativo</option>
-                      <option value="inativo">inativo</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
+          {(formData.selectedTab || "pessoais") === "complementares" && (
+            <>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="data_nacimento"
+                    className="text-sm text-gray-700 mb-1"
+                  >
+                    Data de nascimento
+                  </label>
                   <input
-                    name="empresa"
-                    value={formData.empresa}
-                    placeholder="Empresa"
+                    name="data_nacimento"
+                    type="date"
+                    value={formData.data_nacimento}
                     onChange={handleChange}
-                    className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
-                  />
-                  <input
-                    name="profession"
-                    value={formData.profession}
-                    placeholder="Profissão"
-                    onChange={handleChange}
-                    className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+                    className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500"
+                    placeholder="AAAA-mm-dd"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    name="atividade_economica"
-                    value={formData.atividade_economica}
-                    placeholder="Atividade econômica"
-                    onChange={handleChange}
-                    className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
-                  />
+                <div className="flex flex-col">
+                  <label htmlFor="Staus" className="text-sm text-gray-700 mb-1">
+                    Status
+                  </label>
                   <select
-                    name="estado_civil"
-                    value={formData.estado_civil}
+                    className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500"
+                    name="status"
+                    value={formData.status}
                     onChange={handleChange}
-                    className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+                    id="status"
                   >
                     <option value="" disabled>
-                      Selecione o estado civil
+                      Selecione o status
                     </option>
-                    <option value="casado">Casado</option>
-                    <option value="divorciado">Divorciado</option>
-                    <option value="solteiro">Solteiro</option>
-                    <option value="viuvo">Viúvo</option>
+                    <option value="ativo">ativo</option>
+                    <option value="inativo">inativo</option>
                   </select>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    name="nome_pai"
-                    value={formData.nome_pai}
-                    placeholder="Nome do pai"
-                    onChange={handleChange}
-                    className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
-                  />
-                  <input
-                    name="nome_mae"
-                    value={formData.nome_mae}
-                    placeholder="Nome da mãe"
-                    onChange={handleChange}
-                    className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    name="cidade_naturalidade"
-                    value={formData.cidade_naturalidade}
-                    placeholder="Cidade (Naturalidade)"
-                    onChange={handleChange}
-                    className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
-                  />
-                  <input
-                    name="pais"
-                    value={formData.pais}
-                    placeholder="País (Nacionalidade)"
-                    onChange={handleChange}
-                    className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
-                  />
-                </div>
-                <textarea
-                  name="coment_text"
-                  value={formData.coment_text}
-                  placeholder="Comentários"
-                  onChange={handleChange}
-                  className="border flex items-center py-10 flex-1 px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
-                />
-              </>
-            )
-          }
-
-          {
-            // @ts-ignore
-            (formData.selectedTab || "pessoais") === "address" && (
-              <>
-                <div className="grid">
-                  <input
-                    name="cep"
-                    value={formatarCEP(formData.cep)}
-                    placeholder="CEP"
-                    onChange={handleChange}
-                    className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
-                    maxLength={9}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <input
-                    name="rua"
-                    value={formData.rua}
-                    placeholder="Digite a rua"
-                    onChange={handleChange}
-                    className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
-                  />
-                  <input
-                    name="numero"
-                    value={formData.numero}
-                    placeholder="Digite o número"
-                    onChange={handleChange}
-                    className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <input
-                    name="cidade"
-                    value={formData.cidade}
-                    placeholder="Digite a cidade"
-                    onChange={handleChange}
-                    className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
-                  />
-                  <input
-                    name="estado"
-                    value={formData.estado}
-                    placeholder="Digite o estado"
-                    onChange={handleChange}
-                    className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
-                  />
-                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <input
-                  name="pais_mora"
-                  value={formData.pais_mora}
-                  placeholder="Digite o país"
+                  name="empresa"
+                  value={formData.empresa}
+                  placeholder="Empresa"
+                  onChange={handleChange}
+                  className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+                />
+                <input
+                  name="profession"
+                  value={formData.profession}
+                  placeholder="Profissão"
+                  onChange={handleChange}
+                  className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  name="atividade_economica"
+                  value={formData.atividade_economica}
+                  placeholder="Atividade econômica"
+                  onChange={handleChange}
+                  className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+                />
+                <select
+                  name="estado_civil"
+                  value={formData.estado_civil}
+                  onChange={handleChange}
+                  className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+                >
+                  <option value="" disabled>
+                    Selecione o estado civil
+                  </option>
+                  <option value="casado">Casado</option>
+                  <option value="divorciado">Divorciado</option>
+                  <option value="solteiro">Solteiro</option>
+                  <option value="viuvo">Viúvo</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  name="nome_pai"
+                  value={formData.nome_pai}
+                  placeholder="Nome do pai"
+                  onChange={handleChange}
+                  className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+                />
+                <input
+                  name="nome_mae"
+                  value={formData.nome_mae}
+                  placeholder="Nome da mãe"
+                  onChange={handleChange}
+                  className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  name="cidade_naturalidade"
+                  value={formData.cidade_naturalidade}
+                  placeholder="Cidade (Naturalidade)"
+                  onChange={handleChange}
+                  className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+                />
+                <input
+                  name="pais"
+                  value={formData.pais}
+                  placeholder="País (Nacionalidade)"
+                  onChange={handleChange}
+                  className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+                />
+              </div>
+              <textarea
+                name="coment_text"
+                value={formData.coment_text}
+                placeholder="Comentários"
+                onChange={handleChange}
+                className="border flex items-center py-10 flex-1 px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+              />
+            </>
+          )}
+
+          {(formData.selectedTab || "pessoais") === "address" && (
+            <>
+              <div className="grid">
+                <input
+                  name="cep"
+                  value={formatarCEP(formData.cep)}
+                  placeholder="CEP"
+                  onChange={handleChange}
+                  className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+                  maxLength={9}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  name="rua"
+                  value={formData.rua}
+                  placeholder="Digite a rua"
                   onChange={handleChange}
                   className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
                 />
-              </>
-            )
-          }
+                <input
+                  name="numero"
+                  value={formData.numero}
+                  placeholder="Digite o número"
+                  onChange={handleChange}
+                  className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  name="cidade"
+                  value={formData.cidade}
+                  placeholder="Digite a cidade"
+                  onChange={handleChange}
+                  className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+                />
+                <input
+                  name="estado"
+                  value={formData.estado}
+                  placeholder="Digite o estado"
+                  onChange={handleChange}
+                  className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+                />
+              </div>
+              <input
+                name="pais_mora"
+                value={formData.pais_mora}
+                placeholder="Digite o país"
+                onChange={handleChange}
+                className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+              />
+            </>
+          )}
 
           <div className="flex justify-end gap-2 mt-4">
             <button

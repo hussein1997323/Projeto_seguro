@@ -1,5 +1,4 @@
-// src/components/ClientDetailModal.tsx
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import makeRequest from "@/services/services";
 import { IPost } from "../types/postTypes";
 import { IoIosCloseCircleOutline } from "react-icons/io";
@@ -9,6 +8,21 @@ interface Props {
   onClose: () => void;
 }
 
+// Tupla para abas
+const tabs = ["Informações", "Documentos"] as const;
+type Tab = (typeof tabs)[number];
+
+// Tipo cru do servidor
+interface RawDocument {
+  id: number;
+  origem: string;
+  titulo: string;
+  responsavel: string;
+  nome_arquivo: string;
+  criado_em: string;
+}
+
+// Tipo usado no componente
 interface DocumentItem {
   id: number;
   origem: string;
@@ -19,23 +33,29 @@ interface DocumentItem {
 }
 
 export default function ClientDetailModal({ post, onClose }: Props) {
-  const [selectedTab, setSelectedTab] = useState<"Informações" | "Documentos">(
-    "Informações"
-  );
+  const [selectedTab, setSelectedTab] = useState<Tab>(tabs[0]);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
-  const [newDoc, setNewDoc] = useState({
+  const [newDoc, setNewDoc] = useState<{
+    origem: string;
+    title: string;
+    responsavel: string;
+    arquivo: File | null;
+  }>({
     origem: "",
     title: "",
     responsavel: "",
-    arquivo: null as File | null,
+    arquivo: null,
   });
 
+  // Carrega documentos ao selecionar a aba
   useEffect(() => {
     if (selectedTab === "Documentos") {
       (async () => {
-        const res = await makeRequest.get(`/documentos/cliente/${post.id}`);
+        const res = await makeRequest.get<RawDocument[]>(
+          `/documentos/cliente/${post.id}`
+        );
         setDocuments(
-          res.data.map((doc: any) => ({
+          res.data.map((doc) => ({
             id: doc.id,
             origem: doc.origem,
             title: doc.titulo,
@@ -68,7 +88,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
     { label: "CPF", value: post.cpf },
     { label: "RG", value: post.rg },
     { label: "CNH", value: post.cnh },
-    { label: "Genero", value: post.sexo },
+    { label: "Gênero", value: post.sexo },
     { label: "Data de nascimento", value: post.data_nacimento },
     { label: "Empresa", value: post.empresa },
     { label: "Profissão", value: post.profession },
@@ -91,7 +111,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 shadow"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50"
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -99,26 +119,25 @@ export default function ClientDetailModal({ post, onClose }: Props) {
       >
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-2xl text-gray-500 hover:text-red-500 "
+          className="absolute top-2 right-2 text-2xl text-gray-500 hover:text-red-500"
         >
           <IoIosCloseCircleOutline />
         </button>
 
         <ul className="flex space-x-4 border-b pb-2 mb-4">
-          {["Informações", "Documentos"].map((tab) => (
+          {tabs.map((tab) => (
             <li
               key={tab}
-              onClick={() => setSelectedTab(tab as any)}
+              onClick={() => setSelectedTab(tab)}
               className={`cursor-pointer px-2 pb-1 relative
-        bg-gradient-to-r from-sky-600 via-sky-400 to-sky-100
-        bg-no-repeat bg-bottom
-        ${
-          selectedTab === tab
-            ? "font-bold bg-[length:100%_3px]"
-            : "text-gray-500 bg-[length:0%_3px] hover:bg-[length:100%_3px]"
-        }
-        transition-all duration-300
-      `}
+                bg-gradient-to-r from-sky-600 via-sky-400 to-sky-100
+                bg-no-repeat bg-bottom
+                ${
+                  selectedTab === tab
+                    ? "font-bold bg-[length:100%_3px]"
+                    : "text-gray-500 bg-[length:0%_3px] hover:bg-[length:100%_3px]"
+                }
+                transition-all duration-300`}
             >
               {tab}
             </li>
@@ -133,7 +152,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
                   {label}
                 </span>
                 <span className="text-base font-medium text-gray-800">
-                  {value}
+                  {value || "-"}
                 </span>
               </div>
             ))}
@@ -142,11 +161,11 @@ export default function ClientDetailModal({ post, onClose }: Props) {
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-8">
               <input
-                className="border py-2 px-2 w-50 focus-visible:outline-none rounded "
+                className="border py-2 px-2 w-full rounded"
                 placeholder="Origem"
                 value={newDoc.origem}
                 onChange={(e) =>
-                  setNewDoc({ ...newDoc, origem: e.target.value })
+                  setNewDoc((prev) => ({ ...prev, origem: e.target.value }))
                 }
               />
               <input
@@ -154,7 +173,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
                 placeholder="Título"
                 value={newDoc.title}
                 onChange={(e) =>
-                  setNewDoc({ ...newDoc, title: e.target.value })
+                  setNewDoc((prev) => ({ ...prev, title: e.target.value }))
                 }
               />
               <input
@@ -162,7 +181,10 @@ export default function ClientDetailModal({ post, onClose }: Props) {
                 placeholder="Responsável"
                 value={newDoc.responsavel}
                 onChange={(e) =>
-                  setNewDoc({ ...newDoc, responsavel: e.target.value })
+                  setNewDoc((prev) => ({
+                    ...prev,
+                    responsavel: e.target.value,
+                  }))
                 }
               />
               <input
@@ -170,7 +192,10 @@ export default function ClientDetailModal({ post, onClose }: Props) {
                 className="border p-2 rounded"
                 accept=".pdf,image/*"
                 onChange={(e) =>
-                  setNewDoc({ ...newDoc, arquivo: e.target.files?.[0] || null })
+                  setNewDoc((prev) => ({
+                    ...prev,
+                    arquivo: e.target.files?.[0] || null,
+                  }))
                 }
               />
               <button
