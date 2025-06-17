@@ -1,0 +1,29 @@
+export interface IPost {
+  id: number;
+  username: string;
+  email: string;
+  cpf: string;
+  rg: string;
+  userImg: string;
+  status: string;
+  tipo: string;
+  cnh: string;
+  telefone: string;
+  data_nacimento: string;
+  sexo: string;
+  empresa: string;
+  profession: string;
+  atividade_economica: string;
+  estado_civil: string;
+  nome_pai: string;
+  nome_mae: string;
+  cidade_naturalidade: string;
+  pais: string;
+  coment_text: string;
+  cep: string;
+  rua: string;
+  numero: string;
+  cidade: string;
+  estado: string;
+  pais_mora: string;
+}
