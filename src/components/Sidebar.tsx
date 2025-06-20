@@ -64,12 +64,14 @@ export default function Sidebar() {
 
       {/* Avatar e nome */}
       <div className="flex items-center gap-3 px-4 mt-12 mb-6 relative">
-        <Image
-          className="rounded-full object-cover"
-          src={user.userImg || "/default-user.png"}
-          alt="User"
-          width={40}
-          height={40}
+        <img
+          src={
+            user.userImg
+              ? user.userImg
+              : "https://cdn-icons-png.flaticon.com/256/149/149071.png"
+          }
+          alt="Imagem do perfil"
+          className="w-10 h-10 rounded-full border-2 border-gray-500"
         />
         {showMenu && (
           <span className="text-sm font-medium text-gray-800 truncate max-w-[120px]">

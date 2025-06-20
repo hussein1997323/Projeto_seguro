@@ -37,16 +37,24 @@ function AddUser() {
     user = savedUser ? JSON.parse(savedUser) : null;
   }
   useEffect(() => {
-    if (user) {
-      if (user.nivel === "0") {
-        window.location.href = "/";
-      } else {
-        setLoggedUser(user);
+    if (typeof window !== "undefined") {
+      const savedUser = localStorage.getItem("sistema-cadastro-keite:user");
+      const parsedUser = savedUser ? JSON.parse(savedUser) : null;
+
+      if (!parsedUser) {
+        window.location.href = "/login";
+        return;
       }
-    } else {
-      window.location.href = "/login";
+
+      if (parsedUser.nivel === "0") {
+        window.location.href = "/";
+        return;
+      }
+
+      setLoggedUser(parsedUser);
     }
-  }, [user]);
+  }, []);
+
   const handelDelete = async (id: number) => {
     if (!loggedUser) {
       toast.error("Usuário não autenticado.");
@@ -74,10 +82,6 @@ function AddUser() {
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  });
-
   const fetchUsers = async () => {
     try {
       const res = await makeRequest.get("/auth/search");
@@ -94,6 +98,10 @@ function AddUser() {
       console.error("Erro ao buscar usuários:", msg);
     }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const handleCloseModal = () => {
     clearForm();

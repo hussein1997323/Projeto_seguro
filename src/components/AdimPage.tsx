@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 interface ProtectedRouteProps {
@@ -14,6 +14,11 @@ export default function ProtectedRoute({
   const [isAuthorized, setIsAuthorized] = useState(false);
   const router = useRouter();
 
+  const normalizedLevels = useMemo(
+    () => JSON.stringify(allowLevels.map(String).sort()),
+    [allowLevels]
+  );
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("sistema-cadastro-keite:user");
@@ -23,14 +28,14 @@ export default function ProtectedRoute({
       }
 
       const user = JSON.parse(saved);
-      if (!allowLevels.includes(user.nivel)) {
-        router.push("/"); // ou "/cliente" se quiser que nível 0 vá pra lá
+      if (!allowLevels.map(String).includes(user.nivel)) {
+        router.push("/");
         return;
       }
 
       setIsAuthorized(true);
     }
-  }, [allowLevels, router]);
+  }, [normalizedLevels]);
 
   if (!isAuthorized) return null;
 
