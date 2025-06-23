@@ -23,7 +23,7 @@ export default function Login() {
 
     try {
       const res = await makeRequest.post(
-        "https://husseindev.com.br/auth/login",
+        "https://husseindev.com.br/api/auth/login",
         { login, password }
       );
 
