@@ -22,10 +22,10 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const res = await makeRequest.post(
-        "https://husseindev.com.br/api/auth/login",
-        { login, password }
-      );
+      const res = await makeRequest.post("/api/auth/login", {
+        login,
+        password,
+      });
 
       localStorage.setItem(
         "sistema-cadastro-keite:user",
