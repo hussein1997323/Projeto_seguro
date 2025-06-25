@@ -51,7 +51,7 @@ export default function Vendas() {
 
   const fetchVindas = async () => {
     try {
-      const res = await makeRequest.get("/vindas/searchVenda");
+      const res = await makeRequest.get("/api/vindas/searchVenda");
       setListaVindas(res.data);
     } catch (error: unknown) {
       let msg = "Erro ao buscar vindas.";
@@ -109,7 +109,7 @@ export default function Vendas() {
     if (!cpfSearch) return;
 
     try {
-      const res = await makeRequest.get("/vindas/search", {
+      const res = await makeRequest.get("/api/vindas/search", {
         params: { cpf: cpfSearch },
       });
       setClient({ id: res.data.id });
@@ -159,7 +159,7 @@ export default function Vendas() {
       return;
     }
     try {
-      await makeRequest.post("/vindas/delete", { id });
+      await makeRequest.post("/api/vindas/delete", { id });
       setListaVindas((prev) => prev.filter((venda) => venda.id !== id));
       toast.success("Venda deletada com sucesso");
     } catch (erro) {
@@ -198,7 +198,7 @@ export default function Vendas() {
       if (isEditing && editVenda) {
         // ─── MODO EDIÇÃO ───
         payload.id = editVenda.id;
-        const res = await makeRequest.patch("/vindas/editar", payload);
+        const res = await makeRequest.patch("/api/vindas/editar", payload);
 
         setListaVindas((prev) =>
           prev.map((v) => (v.id === editVenda.id ? res.data : v))

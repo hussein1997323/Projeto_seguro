@@ -123,7 +123,7 @@ export default function ClientModal({
 
     if (initialData) {
       try {
-        const endpoint = "/clienteEdite/clienteEdite";
+        const endpoint = "/api/clienteEdite/clienteEdite";
         const payload = { ...formData, id: initialData.id };
         const res = await makeRequest.patch(endpoint, payload);
         onSave(res.data as IPost);
@@ -135,7 +135,10 @@ export default function ClientModal({
       }
     } else {
       try {
-        const res = await makeRequest.post("/clientModel/clientes", formData);
+        const res = await makeRequest.post(
+          "/api/clientModel/clientes",
+          formData
+        );
         onSave(res.data as IPost);
       } catch (error: unknown) {
         let errorMessage = "Erro ao criar cliente.";

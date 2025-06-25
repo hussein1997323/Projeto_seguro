@@ -73,7 +73,7 @@ function AddUser() {
     if (!confirm) return;
 
     try {
-      await makeRequest.post("/auth/delete", { id });
+      await makeRequest.post("/api/auth/delete", { id });
       toast.success("Usuário deletado com sucesso!");
       fetchUsers();
     } catch (error) {
@@ -84,7 +84,7 @@ function AddUser() {
 
   const fetchUsers = async () => {
     try {
-      const res = await makeRequest.get("/auth/search");
+      const res = await makeRequest.get("/api/auth/search");
       setUsers(res.data);
     } catch (error: unknown) {
       let msg = "Erro ao buscar usuários.";
@@ -133,7 +133,7 @@ function AddUser() {
     }
 
     try {
-      const res = await makeRequest.post("/auth/register", {
+      const res = await makeRequest.post("/api/auth/register", {
         username,
         email,
         cpf,
