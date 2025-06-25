@@ -206,7 +206,7 @@ export default function Vendas() {
         toast.success("Venda atualizada com sucesso");
       } else {
         // ─── MODO CRIAÇÃO ───
-        const res = await makeRequest.post("/vindas/vendas", payload);
+        const res = await makeRequest.post("/api/vindas/vendas", payload);
 
         const novaVenda: IVenda = {
           client_id: res.data.client_id, // ← pega só o número correto
