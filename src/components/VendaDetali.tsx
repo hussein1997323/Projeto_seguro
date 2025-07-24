@@ -51,7 +51,7 @@ export default function VendaDetailModal({ post, onClose }: Props) {
     { label: "Rua", value: post.rua },
     { label: "Cidade", value: post.cidade },
     { label: "Apólice", value: post.apolice },
-    { label: "Seguro", value: post.seguro },
+    { label: "Seguradora", value: post.seguro },
     { label: "Produto", value: post.produto },
     { label: "Placa", value: post.placa },
     { label: "Modelo", value: post.modelo },
