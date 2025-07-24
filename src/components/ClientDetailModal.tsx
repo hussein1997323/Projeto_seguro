@@ -47,6 +47,34 @@ export default function ClientDetailModal({ post, onClose }: Props) {
     arquivo: null,
   });
 
+  const [apolice, setApolice] = useState("");
+  const [seguradora, setSeguradora] = useState("");
+  const [produto, setProduto] = useState("");
+  const [placa, setPlaca] = useState("");
+  const [utilizacao, setUtilizacao] = useState("");
+  const [modelo, setModelo] = useState("");
+  const [datainicial, setDatainicial] = useState("");
+  const [datafinal, setDatafinal] = useState("");
+
+  const handleBuscar = async () => {
+    try {
+      const res = await makeRequest.get(
+        `/api/clientModel/vindaSearch?id=${post.id}`
+      );
+
+      setApolice(res.data.username);
+      setSeguradora(res.data.cpf);
+      setProduto(res.data.status);
+      setPlaca(res.data.rua);
+      setUtilizacao(res.data.cidade);
+      setModelo(res.data.apolice || "");
+      setDatainicial("");
+      setDatafinal("");
+    } catch {
+      console.log("Erro ao buscar as informações");
+    }
+  };
+
   // Carrega documentos ao selecionar a aba
   useEffect(() => {
     if (selectedTab === "Documentos") {
@@ -83,6 +111,11 @@ export default function ClientDetailModal({ post, onClose }: Props) {
     setNewDoc({ origem: "", title: "", responsavel: "", arquivo: null });
     setSelectedTab("Documentos");
   };
+  useEffect(() => {
+    if (selectedTab === "Informações") {
+      handleBuscar();
+    }
+  }, [selectedTab]);
 
   const detailFields = [
     { label: "CPF", value: post.cpf },
@@ -90,15 +123,21 @@ export default function ClientDetailModal({ post, onClose }: Props) {
     { label: "CNH", value: post.cnh },
     { label: "Gênero", value: post.sexo },
     { label: "Data de nascimento", value: post.data_nacimento },
-    { label: "Empresa", value: post.empresa },
     { label: "Profissão", value: post.profession },
-    { label: "Atividade econômica", value: post.atividade_economica },
     { label: "Estado civil", value: post.estado_civil },
     { label: "Nome do pai", value: post.nome_pai },
     { label: "Nome da mãe", value: post.nome_mae },
     { label: "Cidade de naturalidade", value: post.cidade_naturalidade },
     { label: "País de naturalidade", value: post.pais },
     { label: "Comentário", value: post.coment_text },
+    { label: "Apólice", value: apolice },
+    { label: "Seguradora", value: seguradora },
+    { label: "Produto", value: produto },
+    { label: "Placa", value: placa },
+    { label: "Utilização", value: utilizacao },
+    { label: "Modelo", value: modelo },
+    { label: "Data_inicial", value: datainicial },
+    { label: "Data_final", value: datafinal },
     { label: "CEP", value: post.cep },
     { label: "Rua", value: post.rua },
     { label: "Número", value: post.numero },
