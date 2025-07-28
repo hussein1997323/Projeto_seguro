@@ -20,7 +20,7 @@ export default function Pasta() {
     formData.append("file", file);
 
     try {
-      const res = await makeRequest.post("/api/pasta", formData);
+      const res = await makeRequest.post("/api/pasta/pasta", formData);
       const data = res.data;
       setMessage(data.message || "Arquivo enviado com sucesso!");
     } catch (error: unknown) {

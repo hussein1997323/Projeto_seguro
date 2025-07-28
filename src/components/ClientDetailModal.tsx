@@ -53,27 +53,48 @@ export default function ClientDetailModal({ post, onClose }: Props) {
   const [placa, setPlaca] = useState("");
   const [utilizacao, setUtilizacao] = useState("");
   const [modelo, setModelo] = useState("");
-  const [datainicial, setDatainicial] = useState("");
-  const [datafinal, setDatafinal] = useState("");
+  const [data_inicio, setDatainicial] = useState("");
+  const [data_final, setDatafinal] = useState("");
+
+  const limparCampos = () => {
+    setApolice("");
+    setSeguradora("");
+    setProduto("");
+    setPlaca("");
+    setUtilizacao("");
+    setModelo("");
+    setDatainicial("");
+    setDatafinal("");
+  };
 
   const handleBuscar = async () => {
     try {
-      const res = await makeRequest.get(
-        `/api/clientModel/vindaSearch?id=${post.id}`
-      );
+      const res = await makeRequest.get(`api/clientModel/vindaSearch`, {
+        params: { client_id: post.id },
+      });
 
-      setApolice(res.data.username);
-      setSeguradora(res.data.cpf);
-      setProduto(res.data.status);
-      setPlaca(res.data.rua);
-      setUtilizacao(res.data.cidade);
-      setModelo(res.data.apolice || "");
-      setDatainicial("");
-      setDatafinal("");
-    } catch {
-      console.log("Erro ao buscar as informações");
+      const data = res.data[0]; // pega o primeiro item do array
+      if (data) {
+        setApolice(data.apolice);
+        setSeguradora(data.seguro);
+        setProduto(data.produto);
+        setPlaca(data.placa);
+        setUtilizacao(data.utilizacao);
+        setModelo(data.modelo);
+        setDatainicial(data.data_inicio);
+        setDatafinal(data.data_final);
+      } else {
+        limparCampos();
+      }
+    } catch (error) {
+      console.log("Erro ao buscar as informações", error);
     }
   };
+  useEffect(() => {
+    if (selectedTab === "Informações") {
+      handleBuscar();
+    }
+  }, [selectedTab, post.id]);
 
   // Carrega documentos ao selecionar a aba
   useEffect(() => {
@@ -111,11 +132,6 @@ export default function ClientDetailModal({ post, onClose }: Props) {
     setNewDoc({ origem: "", title: "", responsavel: "", arquivo: null });
     setSelectedTab("Documentos");
   };
-  useEffect(() => {
-    if (selectedTab === "Informações") {
-      handleBuscar();
-    }
-  }, [selectedTab]);
 
   const detailFields = [
     { label: "CPF", value: post.cpf },
@@ -136,8 +152,8 @@ export default function ClientDetailModal({ post, onClose }: Props) {
     { label: "Placa", value: placa },
     { label: "Utilização", value: utilizacao },
     { label: "Modelo", value: modelo },
-    { label: "Data_inicial", value: datainicial },
-    { label: "Data_final", value: datafinal },
+    { label: "Data_inicial", value: data_inicio },
+    { label: "Data_final", value: data_final },
     { label: "CEP", value: post.cep },
     { label: "Rua", value: post.rua },
     { label: "Número", value: post.numero },
