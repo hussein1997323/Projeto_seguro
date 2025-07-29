@@ -81,7 +81,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
         setPlaca(data.placa);
         setUtilizacao(data.utilizacao);
         setModelo(data.modelo);
-        setDatainicial(data.data_inicial);
+        setDatainicial(data.data_inicio);
         setDatafinal(data.data_final);
       } else {
         limparCampos();
