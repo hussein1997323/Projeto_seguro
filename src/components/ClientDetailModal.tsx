@@ -140,7 +140,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
     { label: "Gênero", value: post.sexo },
     { label: "Data de nascimento", value: post.data_nacimento },
     { label: "Profissão", value: post.profession },
-    { label: "Profissão", value: post.telefone },
+    { label: "Telefone", value: post.telefone },
     { label: "Estado civil", value: post.estado_civil },
     { label: "Nome do pai", value: post.nome_pai },
     { label: "Nome da mãe", value: post.nome_mae },
