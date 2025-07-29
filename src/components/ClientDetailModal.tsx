@@ -73,7 +73,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
         params: { client_id: post.id },
       });
 
-      const data = res.data[0]; // pega o primeiro item do array
+      const data = res.data; // pega o primeiro item do array
       if (data) {
         setApolice(data.apolice);
         setSeguradora(data.seguro);
