@@ -73,8 +73,9 @@ export default function ClientDetailModal({ post, onClose }: Props) {
         params: { client_id: post.id },
       });
 
-      const data = res.data; // pega o primeiro item do array
-      if (data) {
+      // pega o primeiro item do array
+      if (res.data.length > 0) {
+        const data = res.data[res.data.length - 1];
         setApolice(data.apolice);
         setSeguradora(data.seguro);
         setProduto(data.produto);
@@ -101,7 +102,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
     if (selectedTab === "Documentos") {
       (async () => {
         const res = await makeRequest.get<RawDocument[]>(
-          `/documentos/cliente/${post.id}`
+          `/api/documentos/cliente/${post.id}`
         );
         setDocuments(
           res.data.map((doc) => ({
