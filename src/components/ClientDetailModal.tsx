@@ -53,7 +53,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
   const [placa, setPlaca] = useState("");
   const [utilizacao, setUtilizacao] = useState("");
   const [modelo, setModelo] = useState("");
-  const [data_inicio, setDatainicial] = useState("");
+  const [data_inicial, setDatainicial] = useState("");
   const [data_final, setDatafinal] = useState("");
 
   const limparCampos = () => {
@@ -81,7 +81,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
         setPlaca(data.placa);
         setUtilizacao(data.utilizacao);
         setModelo(data.modelo);
-        setDatainicial(data.data_inicio);
+        setDatainicial(data.data_inicial);
         setDatafinal(data.data_final);
       } else {
         limparCampos();
@@ -152,7 +152,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
     { label: "Placa", value: placa },
     { label: "Utilização", value: utilizacao },
     { label: "Modelo", value: modelo },
-    { label: "Data_inicial", value: data_inicio },
+    { label: "Data_inicial", value: data_inicial },
     { label: "Data_final", value: data_final },
     { label: "CEP", value: post.cep },
     { label: "Rua", value: post.rua },
