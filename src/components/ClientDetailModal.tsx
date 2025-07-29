@@ -127,7 +127,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
     formData.append("responsavel", newDoc.responsavel);
     formData.append("arquivo", newDoc.arquivo);
 
-    await makeRequest.post("/documentos", formData, {
+    await makeRequest.post("/api/documentos", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     setNewDoc({ origem: "", title: "", responsavel: "", arquivo: null });
