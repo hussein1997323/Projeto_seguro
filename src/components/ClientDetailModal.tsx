@@ -69,7 +69,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
 
   const handleBuscar = async () => {
     try {
-      const res = await makeRequest.get(`api/clientModel/vindaSearch`, {
+      const res = await makeRequest.get(`/api/clientModel/vindaSearch`, {
         params: { client_id: post.id },
       });
 

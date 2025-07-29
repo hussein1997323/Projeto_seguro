@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const makeRequest = axios.create({
-  baseURL: "",
+  baseURL: "https://husseindev.com.br/",
 });
 makeRequest.interceptors.request.use(
   (config) => {
