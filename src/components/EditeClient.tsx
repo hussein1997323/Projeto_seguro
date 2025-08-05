@@ -23,7 +23,7 @@ export default function AddClient({
     cnh: initialData?.cnh || "",
     telefone: initialData?.telefone || "",
     sexo: initialData?.sexo || "",
-    empresa: initialData?.empresa || "",
+    bairro: initialData?.bairro || "",
     profession: initialData?.profession || "",
     atividade_economica: initialData?.atividade_economica || "",
     estado_civil: initialData?.estado_civil || "",
