@@ -11,7 +11,7 @@ export interface IPost {
   telefone: string;
   data_nacimento: string;
   sexo: string;
-  empresa: string;
+  bairro: string;
   profession: string;
   atividade_economica: string;
   estado_civil: string;

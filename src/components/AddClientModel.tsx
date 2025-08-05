@@ -37,7 +37,7 @@ export default function ClientModal({
       telefone: "",
       sexo: "",
       status: "",
-      empresa: "",
+      bairro: "",
       profession: "",
       atividade_economica: "",
       estado_civil: "",
@@ -87,7 +87,7 @@ export default function ClientModal({
           rua: data.logradouro || "",
           cidade: data.localidade || "",
           estado: data.uf || "",
-          barrio: data.barrio || "",
+          bairro: data.bairro || "",
           pais_mora: "Brasil",
         }));
       } else {
@@ -96,6 +96,7 @@ export default function ClientModal({
           rua: "",
           cidade: "",
           estado: "",
+          bairro: "",
           pais_mora: "",
         }));
       }
@@ -106,6 +107,7 @@ export default function ClientModal({
         rua: "",
         cidade: "",
         estado: "",
+        bairro: "",
         pais_mora: "",
       }));
     }
@@ -335,14 +337,8 @@ export default function ClientModal({
                   </select>
                 </div>
               </div>
+
               <div className="grid grid-cols-2 gap-4">
-                <input
-                  name="empresa"
-                  value={formData.empresa}
-                  placeholder="Empresa"
-                  onChange={handleChange}
-                  className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
-                />
                 <input
                   name="profession"
                   value={formData.profession}
@@ -350,15 +346,7 @@ export default function ClientModal({
                   onChange={handleChange}
                   className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
                 />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  name="atividade_economica"
-                  value={formData.atividade_economica}
-                  placeholder="Atividade econômica"
-                  onChange={handleChange}
-                  className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus-visible:outline-none focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
-                />
+
                 <select
                   name="estado_civil"
                   value={formData.estado_civil}
@@ -460,6 +448,13 @@ export default function ClientModal({
                   className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
                 />
               </div>
+              <input
+                name="Bairro"
+                value={formData.bairro}
+                placeholder="Barrio"
+                onChange={handleChange}
+                className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+              />
               <input
                 name="pais_mora"
                 value={formData.pais_mora}

@@ -160,6 +160,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
     { label: "Rua", value: post.rua },
     { label: "Número", value: post.numero },
     { label: "Cidade", value: post.cidade },
+    { label: "Bairro", value: post.bairro },
     { label: "Estado", value: post.estado },
     { label: "País onde mora", value: post.pais_mora },
     { label: "Status", value: post.status },
