@@ -39,7 +39,7 @@ export default function ClientModal({
       status: "",
       bairro: "",
       profession: "",
-      atividade_economica: "",
+      telefone2: "",
       estado_civil: "",
       nome_pai: "",
       nome_mae: "",
@@ -270,6 +270,14 @@ export default function ClientModal({
                     onChange={handleChange}
                     className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
                   />
+                  <input
+                    name="telefone-2"
+                    maxLength={15}
+                    value={formatarTelefone(formData.telefone2)}
+                    placeholder="Telefone-2"
+                    onChange={handleChange}
+                    className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
+                  />
                 </div>
                 <select
                   name="tipo"
@@ -318,6 +326,7 @@ export default function ClientModal({
                     placeholder="AAAA-mm-dd"
                   />
                 </div>
+
                 <div className="flex flex-col">
                   <label htmlFor="Staus" className="text-sm text-gray-700 mb-1">
                     Status

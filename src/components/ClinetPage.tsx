@@ -15,21 +15,20 @@ export default function ClientPage() {
   const [busca, setBusca] = useState("");
   const [selectedClient, setSelectedClient] = useState<IPost | null>(null);
   const [initialData, setInitialData] = useState<IPost | null>(null);
-  // Quando o CEP mudar e tiver 8 números, busca o endereço
+  const [statusFilter, setStatusFilter] = useState("todos"); // Novo estado para o filtro de status
 
   const handleSelect = (id: number) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
   };
+
   const handleDelete = async (id: number) => {
-    // Pergunta ao usuário se realmente quer deletar
     if (!window.confirm("Tem certeza que deseja deletar este usuário?")) return;
 
     try {
       await makeRequest.post("/api/clientModel/delete", { id });
       toast.success("Usuário deletado com sucesso!");
-      // Aqui você pode querer atualizar a lista de clientes para refletir a exclusão
     } catch (error) {
       toast.error("Erro ao deletar usuário");
       console.error(error);
@@ -51,13 +50,12 @@ export default function ClientPage() {
       }
     })();
   }, []);
+
   const handleSaveClient = (saved: IPost) => {
     if (initialData) {
-      // edição → substituir no array
       setClients((prev) => prev.map((c) => (c.id === saved.id ? saved : c)));
       toast.success("Cliente atualizado com sucesso!");
     } else {
-      // criação → acrescentar na lista
       setClients((prev) => [...prev, saved]);
       toast.success("Cliente criado com sucesso!");
     }
@@ -71,6 +69,14 @@ export default function ClientPage() {
       (t.email || "").toLowerCase().includes(busca.toLowerCase()) ||
       (t.cpf || "").toString().includes(busca)
   );
+
+  // Filtrando por status
+  const filteredClients = tableFilitrada.filter((client) => {
+    if (statusFilter === "todos") return true;
+    if (statusFilter === "ativo") return client.status === "ativo";
+    if (statusFilter === "inativo") return client.status === "inativo";
+    return client.status === ""; // Para "sem identidade"
+  });
 
   const toggleSelectAll = () => {
     setSelectedIds(
@@ -98,6 +104,24 @@ export default function ClientPage() {
             </button>
           </div>
 
+          {/* Filtro de Status */}
+          <div className="mb-4">
+            <label htmlFor="statusFilter" className="mr-2">
+              Filtrar por Status:
+            </label>
+            <select
+              id="statusFilter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="border p-2 rounded"
+            >
+              <option value="todos">Todos</option>
+              <option value="ativo">Ativo</option>
+              <option value="inativo">Inativo</option>
+              <option value="semIdentidade">Sem Identidade</option>
+            </select>
+          </div>
+
           <table className="w-full border-collapse">
             <thead className="border-b">
               <tr>
@@ -112,12 +136,12 @@ export default function ClientPage() {
                 <th className="p-2 text-left">Nome</th>
                 <th className="p-2 text-left">Telefone</th>
                 <th className="p-2 text-left">Email</th>
-                <th className="p">Status</th>
+                <th className="p-2 text-left">Status</th>
               </tr>
             </thead>
             <tbody>
-              {tableFilitrada.length > 0 ? (
-                tableFilitrada.map((post) => (
+              {filteredClients.length > 0 ? (
+                filteredClients.map((post) => (
                   <ClientPost
                     key={post.id}
                     post={post}
@@ -130,7 +154,7 @@ export default function ClientPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="p-4 text-center">
+                  <td colSpan={6} className="p-4 text-center">
                     Nenhum usuário encontrado
                   </td>
                 </tr>

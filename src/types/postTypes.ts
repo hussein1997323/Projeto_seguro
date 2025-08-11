@@ -13,7 +13,7 @@ export interface IPost {
   sexo: string;
   bairro: string;
   profession: string;
-  atividade_economica: string;
+  telefone2: string;
   estado_civil: string;
   nome_pai: string;
   nome_mae: string;

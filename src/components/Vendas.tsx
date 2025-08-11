@@ -260,9 +260,20 @@ export default function Vendas() {
     }
   };
 
-  const tableFiltrada = listaVindas.filter((t) =>
-    (t.cpf?.replace(/\D/g, "") || "").includes(cpfFilter.replace(/\D/g, ""))
-  );
+  const tableFiltrada = listaVindas.filter((t) => {
+    const termo = cpfFilter.trim().toLowerCase();
+    const termoNumerico = termo.replace(/\D/g, ""); // só números para CPF
+
+    const cpfNumerico = (t.cpf || "").replace(/\D/g, "");
+    const nomeLower = (t.username || "").toLowerCase();
+    const placaLower = (t.placa || "").toLowerCase();
+
+    return (
+      (termoNumerico && cpfNumerico.includes(termoNumerico)) || // Busca por CPF
+      nomeLower.includes(termo) || // Busca por nome
+      placaLower.includes(termo) // Busca por placa
+    );
+  });
   return (
     <div className="p-6 w-full overflow-x-auto">
       {/* Busca Cliente para Nova Venda (ou Edição) */}
@@ -285,8 +296,8 @@ export default function Vendas() {
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Filtrar tabela por CPF"
-          value={formatarCPF(cpfFilter)}
+          placeholder="Pesquisar Cliente por nome, CPF ou placa"
+          value={cpfFilter}
           onChange={(e) => setCpfFilter(e.target.value)}
           className="border w-1/3 px-3 py-2 rounded focus:outline-none"
         />
@@ -496,7 +507,7 @@ export default function Vendas() {
               {/* Seguro */}
               <div className="w-full flex flex-col">
                 <label className="block text-sm font-medium text-gray-700">
-                  Seguro
+                  Seguradora
                 </label>
                 <select
                   name="seguro"
@@ -510,16 +521,18 @@ export default function Vendas() {
                   </option>
                   <option value="Porto Seguros">Porto Seguros</option>
                   <option value="Azul Seguros">Azul Seguros</option>
-                  <option value="Tokin Marine">Tokin Marine</option>
+                  <option value="Tokin Marine">Tokio Marine</option>
                   <option value="Allianz">Allianz</option>
                   <option value="Suhai">Suhai</option>
                   <option value="HDI">HDI</option>
                   <option value="Bradesco">Bradesco</option>
                   <option value="Mapfre">Mapfre</option>
-                  <option value="SulAmarica">SulAmarica</option>
+                  <option value="SulAmarica">SulAmerica</option>
                   <option value="Sompo">Sompo</option>
                   <option value="American">American Life</option>
                   <option value="Sabemi">Sabemi</option>
+                  <option value="Pottencial">Pottencial</option>
+                  <option value="Hapvida">Hapvida</option>
                 </select>
               </div>
 
