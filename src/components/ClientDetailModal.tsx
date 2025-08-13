@@ -136,12 +136,14 @@ export default function ClientDetailModal({ post, onClose }: Props) {
 
   const detailFields = [
     { label: "CPF", value: post.cpf },
+    { label: "Email", value: post.email },
     { label: "RG", value: post.rg },
     { label: "CNH", value: post.cnh },
     { label: "Gênero", value: post.sexo },
     { label: "Data de nascimento", value: post.data_nacimento },
     { label: "Profissão", value: post.profession },
     { label: "Telefone", value: post.telefone },
+    { label: "Telefone2", value: post.telefone2 },
     { label: "Estado civil", value: post.estado_civil },
     { label: "Nome do pai", value: post.nome_pai },
     { label: "Nome da mãe", value: post.nome_mae },

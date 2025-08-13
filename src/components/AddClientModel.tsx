@@ -123,14 +123,20 @@ export default function ClientModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const payload = {
+      ...formData,
+      data_nacimento:
+        formData.data_nacimento.trim() === "" ? null : formData.data_nacimento,
+    };
+
     if (initialData) {
       try {
+        payload.id = initialData.id;
         const endpoint = "/api/clienteEdite/clienteEdite";
-        const payload = { ...formData, id: initialData.id };
         const res = await makeRequest.patch(endpoint, payload);
         onSave(res.data as IPost);
         toast.success("Cliente atualizado com sucesso!");
-        onClose(); // fecha o modal após salvar
+        onClose();
       } catch (err: unknown) {
         console.error("Erro na requisição PATCH:", err);
         toast.error("Erro ao atualizar cliente.");
@@ -139,18 +145,16 @@ export default function ClientModal({
       try {
         const res = await makeRequest.post(
           "/api/clientModel/clientes",
-          formData
+          payload
         );
         onSave(res.data as IPost);
       } catch (error: unknown) {
         let errorMessage = "Erro ao criar cliente.";
-
         if (error instanceof AxiosError) {
           errorMessage += " " + (error.response?.data?.msg || error.message);
         } else if (error instanceof Error) {
           errorMessage += " " + error.message;
         }
-
         console.error(errorMessage, error);
         toast.error(errorMessage);
       }
@@ -271,7 +275,7 @@ export default function ClientModal({
                     className="flex-1 border px-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-500 hover:border-sky-500"
                   />
                   <input
-                    name="telefone-2"
+                    name="telefone2"
                     maxLength={15}
                     value={formatarTelefone(formData.telefone2)}
                     placeholder="Telefone-2"

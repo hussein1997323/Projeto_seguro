@@ -311,6 +311,7 @@ export default function Vendas() {
             <tr>
               <th className="p-3 text-left">Cliente</th>
               <th className="p-3 text-left">CPF</th>
+              <th className="p-3 text-left">Placa</th>
               <th className="p-3 text-left">Valor</th>
               <th className="p-3 text-left">Data</th>
               <th className="p-3 text-left">Ações</th>
@@ -327,6 +328,7 @@ export default function Vendas() {
                     {venda.username}
                   </td>
                   <td className="p-3">{formatarCPF(venda.cpf)}</td>
+                  <td className="p-3">{venda.placa}</td>
                   <td className="p-3">R$ {venda.valor}</td>
                   <td className="p-3">
                     {new Date(venda.created_at).toLocaleDateString("pt-BR")}
