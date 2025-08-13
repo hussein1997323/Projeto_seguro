@@ -126,7 +126,10 @@ export default function ClientModal({
     const payload = {
       ...formData,
       data_nacimento:
-        formData.data_nacimento.trim() === "" ? null : formData.data_nacimento,
+        typeof formData.data_nacimento === "string" &&
+        formData.data_nacimento.trim() !== ""
+          ? formData.data_nacimento.trim()
+          : null,
     };
 
     if (initialData) {
