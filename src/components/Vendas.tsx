@@ -331,7 +331,7 @@ export default function Vendas() {
                   <td className="p-3">{venda.placa}</td>
                   <td className="p-3">R$ {venda.valor}</td>
                   <td className="p-3">
-                    {new Date(venda.created_at).toLocaleDateString("pt-BR")}
+                    {new Date(venda.data_final).toLocaleDateString("pt-BR")}
                   </td>
                   <td className="p-3 space-x-2">
                     {/* Botão Deletar */}

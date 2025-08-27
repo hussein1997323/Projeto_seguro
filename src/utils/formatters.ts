@@ -1,12 +1,28 @@
-export const formatarCPF = (cpf: string | undefined | null): string => {
-  if (!cpf) return "";
+export const formatarCPF = (doc: string | undefined | null): string => {
+  if (!doc) return "";
 
-  cpf = cpf.replace(/\D/g, "");
+  const numeros = doc.replace(/\D/g, "");
 
-  if (cpf.length <= 3) return cpf;
-  if (cpf.length <= 6) return cpf.replace(/(\d{3})(\d{1,})/, "$1.$2");
-  if (cpf.length <= 9) return cpf.replace(/(\d{3})(\d{3})(\d{1,})/, "$1.$2.$3");
-  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{1,})/, "$1.$2.$3-$4");
+  // CPF → até 11 dígitos
+  if (numeros.length <= 11) {
+    if (numeros.length <= 3) return numeros;
+    if (numeros.length <= 6) return numeros.replace(/(\d{3})(\d{1,})/, "$1.$2");
+    if (numeros.length <= 9)
+      return numeros.replace(/(\d{3})(\d{3})(\d{1,})/, "$1.$2.$3");
+    return numeros.replace(/(\d{3})(\d{3})(\d{3})(\d{1,})/, "$1.$2.$3-$4");
+  }
+
+  // CNPJ → até 14 dígitos
+  if (numeros.length <= 2) return numeros;
+  if (numeros.length <= 5) return numeros.replace(/(\d{2})(\d{1,})/, "$1.$2");
+  if (numeros.length <= 8)
+    return numeros.replace(/(\d{2})(\d{3})(\d{1,})/, "$1.$2.$3");
+  if (numeros.length <= 12)
+    return numeros.replace(/(\d{2})(\d{3})(\d{3})(\d{1,})/, "$1.$2.$3/$4");
+  return numeros.replace(
+    /(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,})/,
+    "$1.$2.$3/$4-$5"
+  );
 };
 
 export const formatarRG = (rg: string | null | undefined): string => {

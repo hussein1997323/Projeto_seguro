@@ -1,8 +1,10 @@
 import axios from "axios";
 
 const makeRequest = axios.create({
-  baseURL: "https://husseindev.com.br/",
+  baseURL: "https://basybee.com.br/",
+  withCredentials: true, // IMPORTANTE se backend usar cookies
 });
+
 makeRequest.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {

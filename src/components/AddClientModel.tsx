@@ -227,7 +227,7 @@ export default function ClientModal({
                   />
                   <input
                     name="cpf"
-                    maxLength={14}
+                    maxLength={18}
                     value={formatarCPF(formData.cpf)}
                     placeholder="CPF"
                     onChange={handleChange}

@@ -140,7 +140,10 @@ export default function ClientDetailModal({ post, onClose }: Props) {
     { label: "RG", value: post.rg },
     { label: "CNH", value: post.cnh },
     { label: "Gênero", value: post.sexo },
-    { label: "Data de nascimento", value: post.data_nacimento },
+    {
+      label: "Data de nascimento",
+      value: new Date(post.data_nacimento).toLocaleDateString("pt-BR"),
+    },
     { label: "Profissão", value: post.profession },
     { label: "Telefone", value: post.telefone },
     { label: "Telefone2", value: post.telefone2 },
