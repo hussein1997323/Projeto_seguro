@@ -17,7 +17,7 @@ function Deshbord() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await makeRequest.get("/api/dashboard/dashboard");
+        const res = await makeRequest.get("/dashboard/dashboard");
         setStats(res.data);
       } catch (err) {
         console.error("Erro ao buscar estatísticas:", err);

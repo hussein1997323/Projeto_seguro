@@ -22,7 +22,7 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const res = await makeRequest.post("/api/auth/login", {
+      const res = await makeRequest.post("/auth/login", {
         login,
         password,
       });

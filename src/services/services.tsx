@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const makeRequest = axios.create({
-  baseURL: "https://basybee.com.br/",
+  baseURL: "https://basybee.com.br/api/",
   withCredentials: true, // IMPORTANTE se backend usar cookies
 });
 

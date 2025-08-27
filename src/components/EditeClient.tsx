@@ -54,7 +54,7 @@ export default function AddClient({
       return; // criação não implementada
     }
 
-    const endpoint = "/api/clienteEdite";
+    const endpoint = "/clienteEdite";
     // payload includes id from initialData
     const payload: IPost = { ...(formData as IPost), id: initialData.id };
     console.log("Enviando PATCH para:", endpoint, "com payload:", payload);

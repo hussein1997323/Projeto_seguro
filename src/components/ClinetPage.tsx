@@ -27,7 +27,7 @@ export default function ClientPage() {
     if (!window.confirm("Tem certeza que deseja deletar este usuário?")) return;
 
     try {
-      await makeRequest.post("/api/clientModel/delete", { id });
+      await makeRequest.post("/clientModel/delete", { id });
       toast.success("Usuário deletado com sucesso!");
     } catch (error) {
       toast.error("Erro ao deletar usuário");
@@ -43,7 +43,7 @@ export default function ClientPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await makeRequest.get("/api/clientModel/clientes");
+        const res = await makeRequest.get("/clientModel/clientes");
         setClients(res.data);
       } catch (err) {
         console.error(err);

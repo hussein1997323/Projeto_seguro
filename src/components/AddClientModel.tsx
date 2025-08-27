@@ -135,7 +135,7 @@ export default function ClientModal({
     if (initialData) {
       try {
         payload.id = initialData.id;
-        const endpoint = "/api/clienteEdite/clienteEdite";
+        const endpoint = "/clienteEdite/clienteEdite";
         const res = await makeRequest.patch(endpoint, payload);
         onSave(res.data as IPost);
         toast.success("Cliente atualizado com sucesso!");
@@ -146,10 +146,7 @@ export default function ClientModal({
       }
     } else {
       try {
-        const res = await makeRequest.post(
-          "/api/clientModel/clientes",
-          payload
-        );
+        const res = await makeRequest.post("/clientModel/clientes", payload);
         onSave(res.data as IPost);
       } catch (error: unknown) {
         let errorMessage = "Erro ao criar cliente.";
