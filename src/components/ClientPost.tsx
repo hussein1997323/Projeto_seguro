@@ -21,7 +21,12 @@ const ClientPost = ({
   return (
     <tr className="hover:bg-gray-50 border-b text-sm group">
       <td className="p-2">
-        <input type="checkbox" checked={isSelected} onChange={onSelect} />
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={onSelect}
+          className="cursor-pointer"
+        />
       </td>
       <td className="p-2">{post.tipo}</td>
       <td className="p-2">
@@ -51,7 +56,6 @@ const ClientPost = ({
 
       <td className="p-2 text-right text-2xl">
         <div className="flex justify-end space-x-2">
-          {/* Chame diretamente onEdit() aqui */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -65,9 +69,9 @@ const ClientPost = ({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onDelete(); // <- chama a função
+              onDelete();
             }}
-            className="text-sky-500 hover:text-red-700"
+            className="text-red-500 hover:text-red-700"
             title="Excluir Cliente"
           >
             <MdDelete size={18} />

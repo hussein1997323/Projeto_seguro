@@ -69,7 +69,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
 
   const handleBuscar = async () => {
     try {
-      const res = await makeRequest.get(`/api/clientModel/vindaSearch`, {
+      const res = await makeRequest.get(`/clientModel/vindaSearch`, {
         params: { client_id: post.id },
       });
 
@@ -102,7 +102,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
     if (selectedTab === "Documentos") {
       (async () => {
         const res = await makeRequest.get<RawDocument[]>(
-          `/api/documentos/cliente/${post.id}`
+          `/documentos/cliente/${post.id}`
         );
         setDocuments(
           res.data.map((doc) => ({
@@ -127,7 +127,7 @@ export default function ClientDetailModal({ post, onClose }: Props) {
     formData.append("responsavel", newDoc.responsavel);
     formData.append("arquivo", newDoc.arquivo);
 
-    await makeRequest.post("/api/documentos", formData, {
+    await makeRequest.post("/documentos", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     setNewDoc({ origem: "", title: "", responsavel: "", arquivo: null });
@@ -170,6 +170,25 @@ export default function ClientDetailModal({ post, onClose }: Props) {
     { label: "País onde mora", value: post.pais_mora },
     { label: "Status", value: post.status },
   ];
+
+  const handleDownload = async (id: number, filename: string) => {
+    try {
+      const res = await makeRequest.get(`/documentos/arquivo/${id}`, {
+        responseType: "blob", // importante para arquivos
+      });
+
+      // Criar link temporário no navegador
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error("Erro ao baixar arquivo:", err);
+    }
+  };
 
   return (
     <div
@@ -285,16 +304,15 @@ export default function ClientDetailModal({ post, onClose }: Props) {
                     <td className="p-2">{doc.origem}</td>
                     <td className="p-2">{doc.title}</td>
                     <td className="p-2">{doc.responsavel}</td>
-                    <td className="p-2">
-                      <a
-                        className="text-blue-600 hover:text-red-600 underline"
-                        href={`${makeRequest.defaults.baseURL}/documentos/arquivo/${doc.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <td className="p-2 flex gap-2">
+                      <button
+                        onClick={() => handleDownload(doc.id, doc.arquivoNome)}
+                        className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-700 font-medium hover:bg-green-200 transition"
                       >
-                        {doc.arquivoNome}
-                      </a>
+                        Baixar
+                      </button>
                     </td>
+
                     <td className="p-2">{doc.criadoEm}</td>
                   </tr>
                 ))}

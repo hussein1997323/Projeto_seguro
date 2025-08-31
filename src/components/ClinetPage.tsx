@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import ClientPost from "./ClientPost";
 import makeRequest from "@/services/services";
@@ -7,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import AddClinetModal from "./AddClientModel";
 import ClientDetailModal from "./ClientDetailModal";
 import ProProtectedRoute from "./AdimPage";
+import Sidebar from "./Sidebar";
 
 export default function ClientPage() {
   const [clients, setClients] = useState<IPost[]>([]);
@@ -15,7 +18,8 @@ export default function ClientPage() {
   const [busca, setBusca] = useState("");
   const [selectedClient, setSelectedClient] = useState<IPost | null>(null);
   const [initialData, setInitialData] = useState<IPost | null>(null);
-  const [statusFilter, setStatusFilter] = useState("todos"); // Novo estado para o filtro de status
+  const [statusFilter, setStatusFilter] = useState("todos");
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
 
   const handleSelect = (id: number) => {
     setSelectedIds((prev) =>
@@ -25,7 +29,6 @@ export default function ClientPage() {
 
   const handleDelete = async (id: number) => {
     if (!window.confirm("Tem certeza que deseja deletar este usuário?")) return;
-
     try {
       await makeRequest.post("/clientModel/delete", { id });
       toast.success("Usuário deletado com sucesso!");
@@ -43,10 +46,14 @@ export default function ClientPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await makeRequest.get("/clientModel/clientes");
+        const token = localStorage.getItem("token");
+        const res = await makeRequest.get("/clientModel/clientes", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setClients(res.data);
       } catch (err) {
         console.error(err);
+        toast.error("Sessão expirada, faça login novamente");
       }
     })();
   }, []);
@@ -70,12 +77,11 @@ export default function ClientPage() {
       (t.cpf || "").toString().includes(busca)
   );
 
-  // Filtrando por status
   const filteredClients = tableFilitrada.filter((client) => {
     if (statusFilter === "todos") return true;
     if (statusFilter === "ativo") return client.status === "ativo";
     if (statusFilter === "inativo") return client.status === "inativo";
-    return client.status === ""; // Para "sem identidade"
+    return client.status === "";
   });
 
   const toggleSelectAll = () => {
@@ -86,84 +92,80 @@ export default function ClientPage() {
 
   return (
     <ProProtectedRoute allowLevels={["0", "1", "2"]}>
-      <>
-        <div className="p-6 w-full">
-          <div className="mb-4 flex justify-between items-center">
-            <h1 className="text-xl font-semibold">Contatos</h1>
-            <input
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              placeholder="Buscar Cliente"
-              className="border p-2 rounded px-16 focus:outline-none"
-            />
-            <button
-              onClick={() => setShowModal(!showModal)}
-              className="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded"
-            >
-              ADICIONAR
-            </button>
+      <div className="flex h-screen w-full">
+        {/* Sidebar fixa */}
+
+        {/* Conteúdo principal */}
+        <div className={`flex-1 transition-all duration-300 overflow-hidden`}>
+          <div className="flex flex-col h-full">
+            {/* Filtros e busca */}
+            <div className="p-6 flex justify-between items-center flex-shrink-0">
+              <h1 className="text-xl font-semibold">Contatos</h1>
+              <input
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                placeholder="Buscar Cliente"
+                className="border p-2 rounded px-16 focus:outline-none"
+              />
+              <button
+                onClick={() => setShowModal(!showModal)}
+                className="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded"
+              >
+                ADICIONAR
+              </button>
+            </div>
+
+            {/* Tabela rolável */}
+            <div className="flex-1 overflow-auto p-6">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead className="border-b bg-gray-50 sticky top-0">
+                    <tr>
+                      <th className="p-2">
+                        <input
+                          type="checkbox"
+                          onChange={toggleSelectAll}
+                          checked={selectedIds.length === clients.length}
+                        />
+                      </th>
+                      <th className="p-2 text-left">Tipo</th>
+                      <th className="p-2 text-left">Nome</th>
+                      <th className="p-2 text-left">Telefone</th>
+                      <th className="p-2 text-left">Email</th>
+                      <th className="p-2 text-left">Status</th>
+                      <th className="p-2 text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredClients.length > 0 ? (
+                      filteredClients.map((post) => (
+                        <ClientPost
+                          key={post.id}
+                          post={post}
+                          isSelected={selectedIds.includes(post.id)}
+                          onSelect={() => handleSelect(post.id)}
+                          onShowDetails={() => setSelectedClient(post)}
+                          onEdit={() => handleEditClick(post)}
+                          onDelete={() => handleDelete(post.id)}
+                        />
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={7} className="p-4 text-center">
+                          Nenhum usuário encontrado
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <ToastContainer />
           </div>
-
-          {/* Filtro de Status */}
-          <div className="mb-4">
-            <label htmlFor="statusFilter" className="mr-2">
-              Filtrar por Status:
-            </label>
-            <select
-              id="statusFilter"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="border p-2 rounded"
-            >
-              <option value="todos">Todos</option>
-              <option value="ativo">Ativo</option>
-              <option value="inativo">Inativo</option>
-              <option value="semIdentidade">Sem Identidade</option>
-            </select>
-          </div>
-
-          <table className="w-full border-collapse">
-            <thead className="border-b">
-              <tr>
-                <th className="p-2">
-                  <input
-                    type="checkbox"
-                    onChange={toggleSelectAll}
-                    checked={selectedIds.length === clients.length}
-                  />
-                </th>
-                <th className="p-2 text-left">Tipo</th>
-                <th className="p-2 text-left">Nome</th>
-                <th className="p-2 text-left">Telefone</th>
-                <th className="p-2 text-left">Email</th>
-                <th className="p-2 text-left">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredClients.length > 0 ? (
-                filteredClients.map((post) => (
-                  <ClientPost
-                    key={post.id}
-                    post={post}
-                    isSelected={selectedIds.includes(post.id)}
-                    onSelect={() => handleSelect(post.id)}
-                    onShowDetails={() => setSelectedClient(post)}
-                    onEdit={() => handleEditClick(post)}
-                    onDelete={() => handleDelete(post.id)}
-                  />
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="p-4 text-center">
-                    Nenhum usuário encontrado
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-
-          <ToastContainer />
         </div>
+
+        {/* Modais */}
         {showModal && (
           <AddClinetModal
             initialData={initialData}
@@ -181,7 +183,7 @@ export default function ClientPage() {
             onClose={() => setSelectedClient(null)}
           />
         )}
-      </>
+      </div>
     </ProProtectedRoute>
   );
 }
