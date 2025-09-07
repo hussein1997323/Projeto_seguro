@@ -1,11 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, UserCheck, DollarSign } from "lucide-react"; // opcional
+import { Users, UserCheck, DollarSign } from "lucide-react";
 import makeRequest from "@/services/services";
 
-function Deshbord() {
-  const [stats, setStats] = useState({
+// Tipagem segura do estado
+interface Stats {
+  totalUsers: number;
+  totalClients: number;
+  totalValue: number;
+  totalAtivo: number;
+  totalInativo: number;
+  totalSemIdentidade: number;
+}
+
+const Dashboard: React.FC = () => {
+  const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
     totalClients: 0,
     totalValue: 0,
@@ -18,7 +28,16 @@ function Deshbord() {
     const fetchStats = async () => {
       try {
         const res = await makeRequest.get("/dashboard/dashboard");
-        setStats(res.data);
+
+        // Garantindo fallback seguro caso algum valor venha undefined
+        setStats({
+          totalUsers: res.data.totalUsers ?? 0,
+          totalClients: res.data.totalClients ?? 0,
+          totalValue: res.data.totalValue ?? 0,
+          totalAtivo: res.data.totalAtivo ?? 0,
+          totalInativo: res.data.totalInativo ?? 0,
+          totalSemIdentidade: res.data.totalSemIdentidade ?? 0,
+        });
       } catch (err) {
         console.error("Erro ao buscar estatísticas:", err);
       }
@@ -33,37 +52,46 @@ function Deshbord() {
 
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-        <div className="bg-blue-100 text-blue-800 p-6 rounded-2xl shadow-md flex items-center justify-between">
+        {/* Usuários */}
+        <div className="bg-blue-50 text-blue-900 p-6 rounded-2xl shadow-lg flex items-center justify-between hover:shadow-xl transition-shadow duration-300">
           <div>
-            <p className="text-xl font-semibold">Usuários</p>
-            <p className="text-3xl font-bold">{stats.totalUsers}</p>
+            <p className="text-lg font-medium text-blue-700">Usuários</p>
+            <p className="text-2xl md:text-3xl font-bold">{stats.totalUsers}</p>
           </div>
-          <Users className="w-10 h-10" />
+          <Users className="w-10 h-10 text-blue-500" />
         </div>
 
-        <div className="bg-green-100 text-green-800 p-6 rounded-2xl shadow-md flex items-center justify-between">
+        {/* Clientes */}
+        <div className="bg-green-50 text-green-900 p-6 rounded-2xl shadow-lg flex items-center justify-between hover:shadow-xl transition-shadow duration-300">
           <div>
-            <p className="text-xl font-semibold">Clientes</p>
-            <p className="text-3xl font-bold">{stats.totalClients}</p>
-          </div>
-          <UserCheck className="w-10 h-10" />
-        </div>
-
-        <div className="bg-red-100 text-red-800 p-6 rounded-2xl shadow-md flex items-center justify-between">
-          <div>
-            <p className="text-xl font-semibold">Vendas</p>
-            <p className="text-3xl font-bold">
-              R$ {Number(stats.totalValue).toFixed(2)}
+            <p className="text-lg font-medium text-green-700">Clientes</p>
+            <p className="text-2xl md:text-3xl font-bold">
+              {stats.totalClients}
             </p>
           </div>
-          <DollarSign className="w-10 h-10" />
+          <UserCheck className="w-10 h-10 text-green-500" />
+        </div>
+
+        {/* Vendas */}
+        <div className="bg-red-50 text-red-900 p-6 rounded-2xl shadow-lg flex items-center justify-between hover:shadow-xl transition-shadow duration-300">
+          <div>
+            <p className="text-lg font-medium text-red-700">Vendas</p>
+            <p className="text-2xl md:text-3xl font-bold">
+              R${" "}
+              {Number(stats.totalValue ?? 0).toLocaleString("pt-BR", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </p>
+          </div>
+          <DollarSign className="w-10 h-10 text-red-500" />
         </div>
       </div>
 
       {/* Status Table */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+          <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md overflow-hidden">
             <thead className="bg-gray-100">
               <tr>
                 <th className="text-left py-3 px-6 font-semibold text-gray-600">
@@ -75,15 +103,15 @@ function Deshbord() {
               </tr>
             </thead>
             <tbody>
-              <tr className="hover:bg-gray-50">
+              <tr className="hover:bg-gray-50 even:bg-gray-50">
                 <td className="py-3 px-6 text-green-600 font-medium">Ativo</td>
                 <td className="py-3 px-6">{stats.totalAtivo}</td>
               </tr>
-              <tr className="hover:bg-gray-50">
+              <tr className="hover:bg-gray-50 even:bg-gray-50">
                 <td className="py-3 px-6 text-red-600 font-medium">Inativo</td>
                 <td className="py-3 px-6">{stats.totalInativo}</td>
               </tr>
-              <tr className="hover:bg-gray-50">
+              <tr className="hover:bg-gray-50 even:bg-gray-50">
                 <td className="py-3 px-6 text-gray-500 font-medium">
                   Sem identidade
                 </td>
@@ -93,13 +121,12 @@ function Deshbord() {
           </table>
         </div>
 
-        <div className="flex items-center justify-center text-gray-400">
-          {/* Espaço para gráfico futuro ou informação complementar */}
-          <p className="italic">Informações adicionais em breve...</p>
+        <div className="flex items-center justify-center text-gray-400 italic">
+          Informações adicionais em breve...
         </div>
       </div>
     </div>
   );
-}
+};
 
-export default Deshbord;
+export default Dashboard;
