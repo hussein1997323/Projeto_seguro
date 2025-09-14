@@ -1,8 +1,13 @@
 import axios from "axios";
 
+const baseURL =
+  typeof window !== "undefined" && window.location.hostname === "localhost"
+    ? "http://localhost:5002/api" // seu backend local
+    : "https://basybee.com.br/api"; // produção
+
 const makeRequest = axios.create({
-  baseURL: "https://basybee.com.br/api",
-  withCredentials: true, // IMPORTANTE se backend usar cookies
+  baseURL,
+  withCredentials: true, // necessário se usar cookies no backend
 });
 
 makeRequest.interceptors.request.use(
@@ -18,9 +23,7 @@ makeRequest.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 export default makeRequest;

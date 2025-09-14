@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Users, UserCheck, DollarSign } from "lucide-react";
 import makeRequest from "@/services/services";
 
-// Tipagem segura do estado
 interface Stats {
   totalUsers: number;
   totalClients: number;
@@ -30,14 +29,16 @@ const Dashboard: React.FC = () => {
     const fetchStats = async () => {
       try {
         const res = await makeRequest.get("/dashboard/dashboard");
+        const data = res.data.data ?? res.data; // pega o objeto real, independente da camada "data"
+
         setStats({
-          totalUsers: res.data.totalUsers ?? 0,
-          totalClients: res.data.totalClients ?? 0,
-          totalValue: res.data.totalValue ?? 0,
-          totalAtivo: res.data.totalAtivo ?? 0,
-          totalInativo: res.data.totalInativo ?? 0,
-          totalSemIdentidade: res.data.totalSemIdentidade ?? 0,
-          proximosVencimentos: res.data.proximosVencimentos ?? 0,
+          totalUsers: Number(data.totalUsers ?? 0),
+          totalClients: Number(data.totalClients ?? 0),
+          totalValue: Number(data.totalValue ?? 0),
+          totalAtivo: Number(data.totalAtivo ?? 0),
+          totalInativo: Number(data.totalInativo ?? 0),
+          totalSemIdentidade: Number(data.totalSemIdentidade ?? 0),
+          proximosVencimentos: Number(data.proximosVencimentos ?? 0), // ⬅ aqui
         });
       } catch (err) {
         console.error("Erro ao buscar estatísticas:", err);
@@ -47,7 +48,7 @@ const Dashboard: React.FC = () => {
     fetchStats();
   }, []);
 
-  // Monitorando stats atualizado
+  // Verifica o estado atualizado
   useEffect(() => {
     console.log("Stats atualizado:", stats);
   }, [stats]);
@@ -56,10 +57,8 @@ const Dashboard: React.FC = () => {
     <div className="w-full px-4 sm:px-6 lg:px-12 py-6">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Dashboard</h1>
 
-      {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-        {/* Usuários */}
-        <div className="bg-blue-50 text-blue-900 p-6 rounded-2xl shadow-lg flex items-center justify-between hover:shadow-xl transition-shadow duration-300">
+        <div className="bg-blue-50 text-blue-900 p-6 rounded-2xl shadow-lg flex items-center justify-between">
           <div>
             <p className="text-lg font-medium text-blue-700">Usuários</p>
             <p className="text-2xl md:text-3xl font-bold">{stats.totalUsers}</p>
@@ -67,8 +66,7 @@ const Dashboard: React.FC = () => {
           <Users className="w-10 h-10 text-blue-500" />
         </div>
 
-        {/* Clientes */}
-        <div className="bg-green-50 text-green-900 p-6 rounded-2xl shadow-lg flex items-center justify-between hover:shadow-xl transition-shadow duration-300">
+        <div className="bg-green-50 text-green-900 p-6 rounded-2xl shadow-lg flex items-center justify-between">
           <div>
             <p className="text-lg font-medium text-green-700">Clientes</p>
             <p className="text-2xl md:text-3xl font-bold">
@@ -78,13 +76,12 @@ const Dashboard: React.FC = () => {
           <UserCheck className="w-10 h-10 text-green-500" />
         </div>
 
-        {/* Vendas */}
-        <div className="bg-red-50 text-red-900 p-6 rounded-2xl shadow-lg flex items-center justify-between hover:shadow-xl transition-shadow duration-300">
+        <div className="bg-red-50 text-red-900 p-6 rounded-2xl shadow-lg flex items-center justify-between">
           <div>
             <p className="text-lg font-medium text-red-700">Vendas</p>
             <p className="text-2xl md:text-3xl font-bold">
               R${" "}
-              {Number(stats.totalValue ?? 0).toLocaleString("pt-BR", {
+              {stats.totalValue.toLocaleString("pt-BR", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
@@ -92,7 +89,8 @@ const Dashboard: React.FC = () => {
           </div>
           <DollarSign className="w-10 h-10 text-red-500" />
         </div>
-        <div className="bg-fuchsia-100 text-fuchsia-900 p-6 rounded-2xl shadow-lg flex items-center justify-between hover:shadow-xl transition-shadow duration-300">
+
+        <div className="bg-fuchsia-100 text-fuchsia-900 p-6 rounded-2xl shadow-lg flex items-center justify-between">
           <div>
             <p className="text-lg font-medium text-fuchsia-700">
               Clientes próximos do vencimento
@@ -104,7 +102,6 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Status Table */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md overflow-hidden">
