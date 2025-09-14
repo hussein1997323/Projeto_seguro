@@ -12,6 +12,7 @@ interface Stats {
   totalAtivo: number;
   totalInativo: number;
   totalSemIdentidade: number;
+  proximosVencimentos: number;
 }
 
 const Dashboard: React.FC = () => {
@@ -22,14 +23,13 @@ const Dashboard: React.FC = () => {
     totalAtivo: 0,
     totalInativo: 0,
     totalSemIdentidade: 0,
+    proximosVencimentos: 0,
   });
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const res = await makeRequest.get("/dashboard/dashboard");
-
-        // Garantindo fallback seguro caso algum valor venha undefined
         setStats({
           totalUsers: res.data.totalUsers ?? 0,
           totalClients: res.data.totalClients ?? 0,
@@ -37,6 +37,7 @@ const Dashboard: React.FC = () => {
           totalAtivo: res.data.totalAtivo ?? 0,
           totalInativo: res.data.totalInativo ?? 0,
           totalSemIdentidade: res.data.totalSemIdentidade ?? 0,
+          proximosVencimentos: res.data.proximosVencimentos ?? 0,
         });
       } catch (err) {
         console.error("Erro ao buscar estatísticas:", err);
@@ -45,6 +46,11 @@ const Dashboard: React.FC = () => {
 
     fetchStats();
   }, []);
+
+  // Monitorando stats atualizado
+  useEffect(() => {
+    console.log("Stats atualizado:", stats);
+  }, [stats]);
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-12 py-6">
@@ -85,6 +91,16 @@ const Dashboard: React.FC = () => {
             </p>
           </div>
           <DollarSign className="w-10 h-10 text-red-500" />
+        </div>
+        <div className="bg-fuchsia-100 text-fuchsia-900 p-6 rounded-2xl shadow-lg flex items-center justify-between hover:shadow-xl transition-shadow duration-300">
+          <div>
+            <p className="text-lg font-medium text-fuchsia-700">
+              Clientes próximos do vencimento
+            </p>
+            <p className="text-2xl md:text-3xl font-bold">
+              {stats.proximosVencimentos}
+            </p>
+          </div>
         </div>
       </div>
 
