@@ -48,11 +48,6 @@ const Dashboard: React.FC = () => {
     fetchStats();
   }, []);
 
-  // Verifica o estado atualizado
-  useEffect(() => {
-    console.log("Stats atualizado:", stats);
-  }, [stats]);
-
   return (
     <div className="w-full px-4 sm:px-6 lg:px-12 py-6">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Dashboard</h1>
