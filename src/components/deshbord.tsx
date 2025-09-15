@@ -84,17 +84,6 @@ const Dashboard: React.FC = () => {
           </div>
           <DollarSign className="w-10 h-10 text-red-500" />
         </div>
-
-        <div className="bg-fuchsia-100 text-fuchsia-900 p-6 rounded-2xl shadow-lg flex items-center justify-between">
-          <div>
-            <p className="text-lg font-medium text-fuchsia-700">
-              Clientes próximos do vencimento
-            </p>
-            <p className="text-2xl md:text-3xl font-bold">
-              {stats.proximosVencimentos}
-            </p>
-          </div>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -124,6 +113,12 @@ const Dashboard: React.FC = () => {
                   Sem identidade
                 </td>
                 <td className="py-3 px-6">{stats.totalSemIdentidade}</td>
+              </tr>
+              <tr className="hover:bg-gray-50 even:bg-gray-50">
+                <td className="py-3 px-6 text-gray-500 font-medium">
+                  proximo de vencimento
+                </td>
+                <td className="py-3 px-6">{stats.proximosVencimentos}</td>
               </tr>
             </tbody>
           </table>
